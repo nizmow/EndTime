@@ -5,32 +5,40 @@ namespace EndTime.Core;
 
 public class MapManager
 {
-    private int[,] _tileMap;
-    private Texture2D _tileset;
-    private int _tileSize;
+    private int[,] _map;
+    private readonly TileRegistry _tileRegistry;
 
     // Map id to tile
-    private Dictionary<int, Rectangle> _tileAtlas;
+    // private Dictionary<int, Rectangle> _tileAtlas;
 
-    public MapManager(int width, int height, int tileSize, Texture2D tileset)
+    public MapManager(int width, int height, TileRegistry tileRegistry)
     {
-        _tileMap = new int[width, height];
-        _tileSize = tileSize;
-        _tileset = tileset;
+        _map = new int[width, height];
+        _tileRegistry = tileRegistry;
     }
 
-
-    public void Draw(SpriteBatch spriteBatch)
+    public void SetTile(int x, int y, int tileId)
     {
-        for (var y = 0; y < _tileMap.GetLength(1); y++)
+        if (x >= 0 && x < _map.GetLength(0) && y >= 0 && y < _map.GetLength(1))
+            _map[x, y] = tileId;
+    }
+
+    public void Draw(SpriteBatch spriteBatch, Texture2D tileSet)
+    {
+        for (var y = 0; y < _map.GetLength(1); y++)
         {
-            for (var x = 0; x < _tileMap.GetLength(0); x++)
+            for (var x = 0; x < _map.GetLength(0); x++)
             {
-                var tileId = _tileMap[x, y];
+                var tileId = _map[x, y];
                 if (tileId == 0) continue; // Skip empty tiles
 
-                var position = new Vector2(x * _tileSize, y * _tileSize);
-                spriteBatch.Draw(_tileset, position, _tileAtlas[tileId], Color.White);
+                var tile = _tileRegistry.Get(tileId);
+                var position = new Vector2(
+                    x * SpriteMath.Width,
+                    y * SpriteMath.Height
+                );
+            
+                spriteBatch.Draw(tileSet, position, tile.SoureRect, tile.ForegroundColour);
             }
         }
     }
