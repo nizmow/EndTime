@@ -33,10 +33,7 @@ public class MapManager
                 if (tileId == 0) continue; // Skip empty tiles
 
                 var tile = _tileRegistry.Get(tileId);
-                var position = new Vector2(
-                    x * SpriteMath.Width,
-                    y * SpriteMath.Height
-                );
+                var position = SpriteMath.GetTilePosition(x, y);
             
                 spriteBatch.Draw(tileSet, position, tile.Visual.Rect, tile.Visual.ForegroundColour);
             }

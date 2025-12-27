@@ -25,10 +25,7 @@ public class EntityManager
     {
         foreach (var entity in _entities.Values)
         {
-            var position = new Vector2(
-                entity.X * SpriteMath.Width,
-                entity.Y * SpriteMath.Height
-            );
+            var position = SpriteMath.GetTilePosition(entity.X, entity.Y);
 
             spriteBatch.Draw(tileAtlas, position, entity.EntityDefinition.Visual.Rect, entity.EntityDefinition.Visual.ForegroundColour);
         }

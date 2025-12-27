@@ -14,4 +14,8 @@ public static class SpriteMath
         return new Rectangle(x, y, Width, Height);
     }
 
+    public static Vector2 GetTilePosition(int x, int y)
+    {
+        return new Vector2(x * Width, y * Height);
+    }
 }
