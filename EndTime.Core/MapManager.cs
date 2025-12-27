@@ -38,7 +38,7 @@ public class MapManager
                     y * SpriteMath.Height
                 );
             
-                spriteBatch.Draw(tileSet, position, tile.SoureRect, tile.ForegroundColour);
+                spriteBatch.Draw(tileSet, position, tile.Visual.Rect, tile.Visual.ForegroundColour);
             }
         }
     }

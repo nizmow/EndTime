@@ -47,8 +47,8 @@ public class EndTimeGame : Game
     protected override void Initialize()
     {
         // TODO: temporary, we will load tiles from JSON in the future (and maybe have a tile editor tool, ooh fun)
-        _tileRegistry.Register(new TileDefinition(Id: 1, Name: "wall", IsWalkable: false, Symbol: CodePage437.LightShade, HexForegroundColour: "#FFFFFF"));
-        _tileRegistry.Register(new TileDefinition(Id: 2, Name: "floor", IsWalkable: true, Symbol: CodePage437.MiddleDot, HexForegroundColour: "#CCCCCC"));
+        _tileRegistry.Register(new TileDefinition(Id: 1, Name: "wall", IsWalkable: false, Visual: new SpriteInfo(Symbol: CodePage437.LightShade, HexForegroundColour: "#FFFFFF")));
+        _tileRegistry.Register(new TileDefinition(Id: 2, Name: "floor", IsWalkable: true, Visual: new SpriteInfo(Symbol: CodePage437.MiddleDot, HexForegroundColour: "#CCCCCC")));
 
         _mapManager.SetTile(40, 25, 1);
 
