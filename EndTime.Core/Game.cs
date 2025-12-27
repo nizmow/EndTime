@@ -14,6 +14,10 @@ public class EndTimeGame : Game
 
     private TileRegistry _tileRegistry;
 
+    private EntityRegistry _entityRegistry;
+
+    private EntityManager _entityManager;
+
     // Things will get more complex with levels and scenes, punt that to later.
     private MapManager _mapManager;
 
@@ -24,6 +28,9 @@ public class EndTimeGame : Game
     {
         _graphics = new GraphicsDeviceManager(this);
         _tileRegistry = new TileRegistry();
+        _entityRegistry = new EntityRegistry();
+        _entityManager = new EntityManager();
+
         _mapManager = new MapManager(WIDTH, HEIGHT, _tileRegistry);
         
         _graphics.PreferredBackBufferWidth = WIDTH * SpriteMath.Width;
@@ -45,6 +52,11 @@ public class EndTimeGame : Game
 
         _mapManager.SetTile(40, 25, 1);
 
+        // TODO: temporary, we will load entity definitions from JSON
+        _entityRegistry.Register(new EntityDefinition(Id: 1, Name: "player", Visual: new SpriteInfo(Symbol: CodePage437.SmileyBlack, HexForegroundColour: "#FFFFFF")));
+
+        _entityManager.Add(_entityRegistry.Spawn("player", 10, 10));
+
         base.Initialize();
     }
 
@@ -52,6 +64,9 @@ public class EndTimeGame : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _tileAtlas = Content.Load<Texture2D>("cp437_font");
+
+        // Spawn initial entities
+        
     }
 
     protected override void Update(GameTime gameTime)
@@ -69,6 +84,8 @@ public class EndTimeGame : Game
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
         _mapManager.Draw(_spriteBatch, _tileAtlas);
+
+        _entityManager.Draw(_spriteBatch, _tileAtlas);
 
         _spriteBatch.End();
 
