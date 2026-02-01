@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using EndTime.Core.Input;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace EndTime.Core;
 
@@ -21,6 +21,10 @@ public class EndTimeGame : Game
     // Things will get more complex with levels and scenes, punt that to later.
     private MapManager _mapManager;
 
+    private InputManager _inputManager = new();
+
+    private Entity _player;
+
     private const int WIDTH = 80;
     private const int HEIGHT = 50;
 
@@ -32,7 +36,7 @@ public class EndTimeGame : Game
         _entityManager = new EntityManager();
 
         _mapManager = new MapManager(WIDTH, HEIGHT, _tileRegistry);
-        
+
         _graphics.PreferredBackBufferWidth = WIDTH * SpriteMath.Width;
         _graphics.PreferredBackBufferHeight = HEIGHT * SpriteMath.Height;
 
@@ -54,8 +58,8 @@ public class EndTimeGame : Game
 
         // TODO: temporary, we will load entity definitions from JSON
         _entityRegistry.Register(new EntityDefinition(Id: 1, Name: "player", Visual: new SpriteInfo(Symbol: CodePage437.SmileyBlack, HexForegroundColour: "#FFFFFF")));
-
-        _entityManager.Add(_entityRegistry.Spawn("player", 10, 10));
+        _player = _entityRegistry.Spawn("player", 10, 10);
+        _entityManager.Add(_player);
 
         base.Initialize();
     }
@@ -66,13 +70,22 @@ public class EndTimeGame : Game
         _tileAtlas = Content.Load<Texture2D>("cp437_font");
 
         // Spawn initial entities
-        
+
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+        var playerAction = _inputManager.GetInputAction(gameTime);
+        if (playerAction is QuitAction)
+        {
             Exit();
+        }
+        if (playerAction is MoveAction moveAction)
+        {
+            _player.X += moveAction.DeltaX;
+            _player.Y += moveAction.DeltaY;
+        }
+
         base.Update(gameTime);
     }
 
