@@ -1,4 +1,6 @@
-namespace EndTime.Core;
+using EndTime.Core.World.Entities;
+
+namespace EndTime.Core.Data;
 
 public class EntityRegistry
 {
@@ -11,6 +13,6 @@ public class EntityRegistry
 
     public Entity Spawn(string name, int x, int y)
     {
-        return new Entity { Id = Guid.NewGuid(), EntityDefinition = _entities[name], X = x, Y = y };
+        return new Entity { Id = Guid.NewGuid(), Name = name, EntityDefinition = _entities[name], X = x, Y = y };
     }
 }

@@ -1,4 +1,3 @@
-using EndTime.Core;
 using EndTime.Core.Utilities;
 using Microsoft.Xna.Framework;
 

@@ -1,4 +1,8 @@
-﻿using EndTime.Core.Input;
+﻿using Endtime.Core;
+using EndTime.Core.Data;
+using EndTime.Core.Engine;
+using EndTime.Core.Input;
+using EndTime.Core.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -8,37 +12,26 @@ public class EndTimeGame : Game
 {
     private GraphicsDeviceManager _graphics;
 
-    private SpriteBatch _spriteBatch = null!; // trust me
+    // We have lazy initialisation of all these things, but we promise we will init
+    private SpriteBatch _spriteBatch = null!;
+    private Texture2D _tileAtlas = null!;
+    private Engine.Engine _engine = null!;
+    private Renderer _renderer = null!;
 
-    private Texture2D _tileAtlas = null!; // trust me
-
-    private TileRegistry _tileRegistry;
-
-    private EntityRegistry _entityRegistry;
-
-    private EntityManager _entityManager;
-
-    // Things will get more complex with levels and scenes, punt that to later.
-    private MapManager _mapManager;
-
-    private InputManager _inputManager = new();
-
-    private Entity _player;
+    private readonly EntityRegistry _entityRegistry = new();
+    private readonly TileRegistry _tileRegistry = new();
+    private readonly InputManager _inputManager = new();
 
     private const int WIDTH = 80;
     private const int HEIGHT = 50;
 
     public EndTimeGame()
     {
-        _graphics = new GraphicsDeviceManager(this);
-        _tileRegistry = new TileRegistry();
-        _entityRegistry = new EntityRegistry();
-        _entityManager = new EntityManager();
-
-        _mapManager = new MapManager(WIDTH, HEIGHT, _tileRegistry);
-
-        _graphics.PreferredBackBufferWidth = WIDTH * SpriteMath.Width;
-        _graphics.PreferredBackBufferHeight = HEIGHT * SpriteMath.Height;
+        _graphics = new GraphicsDeviceManager(this)
+        {
+            PreferredBackBufferWidth = WIDTH * SpriteMath.Width,
+            PreferredBackBufferHeight = HEIGHT * SpriteMath.Height,
+        };
 
         Window.AllowUserResizing = true;
 
@@ -51,15 +44,42 @@ public class EndTimeGame : Game
     protected override void Initialize()
     {
         // TODO: temporary, we will load tiles from JSON in the future (and maybe have a tile editor tool, ooh fun)
-        _tileRegistry.Register(new TileDefinition(Id: 1, Name: "wall", IsWalkable: false, Visual: new SpriteInfo(Symbol: CodePage437.LightShade, HexForegroundColour: "#FFFFFF")));
-        _tileRegistry.Register(new TileDefinition(Id: 2, Name: "floor", IsWalkable: true, Visual: new SpriteInfo(Symbol: CodePage437.MiddleDot, HexForegroundColour: "#CCCCCC")));
-
-        _mapManager.SetTile(40, 25, 1);
+        _tileRegistry.Register(
+            new TileDefinition(
+                Id: 1,
+                Name: "wall",
+                IsWalkable: false,
+                Visual: new SpriteInfo(
+                    Symbol: CodePage437.LightShade,
+                    HexForegroundColour: "#FFFFFF"
+                )
+            )
+        );
+        _tileRegistry.Register(
+            new TileDefinition(
+                Id: 2,
+                Name: "floor",
+                IsWalkable: true,
+                Visual: new SpriteInfo(
+                    Symbol: CodePage437.MiddleDot,
+                    HexForegroundColour: "#CCCCCC"
+                )
+            )
+        );
 
         // TODO: temporary, we will load entity definitions from JSON
-        _entityRegistry.Register(new EntityDefinition(Id: 1, Name: "player", Visual: new SpriteInfo(Symbol: CodePage437.SmileyBlack, HexForegroundColour: "#FFFFFF")));
-        _player = _entityRegistry.Spawn("player", 10, 10);
-        _entityManager.Add(_player);
+        _entityRegistry.Register(
+            new EntityDefinition(
+                Id: 1,
+                Name: "player",
+                Visual: new SpriteInfo(
+                    Symbol: CodePage437.SmileyBlack,
+                    HexForegroundColour: "#FFFFFF"
+                )
+            )
+        );
+
+        _engine = new Engine.Engine(_entityRegistry, _tileRegistry);
 
         base.Initialize();
     }
@@ -68,22 +88,25 @@ public class EndTimeGame : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _tileAtlas = Content.Load<Texture2D>("cp437_font");
+        _renderer = new Renderer(_tileRegistry, _tileAtlas);
 
-        // Spawn initial entities
-
+        // Start your engines here
+        _engine.Start();
     }
 
     protected override void Update(GameTime gameTime)
     {
+        // input manager handles debounce/delay/repeat etc.
         var playerAction = _inputManager.GetInputAction(gameTime);
-        if (playerAction is QuitAction)
+
+        if (playerAction != null)
         {
-            Exit();
-        }
-        if (playerAction is MoveAction moveAction)
-        {
-            _player.X += moveAction.DeltaX;
-            _player.Y += moveAction.DeltaY;
+            var result = _engine.Update(playerAction);
+
+            if (result == GameStatus.Quit)
+            {
+                Exit();
+            }
         }
 
         base.Update(gameTime);
@@ -96,9 +119,7 @@ public class EndTimeGame : Game
         // clamp pixel edges for crispy pixels
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
-        _mapManager.Draw(_spriteBatch, _tileAtlas);
-
-        _entityManager.Draw(_spriteBatch, _tileAtlas);
+        _renderer.Draw(_spriteBatch, _engine.World);
 
         _spriteBatch.End();
 

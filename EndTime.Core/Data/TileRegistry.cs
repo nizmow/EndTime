@@ -1,4 +1,4 @@
-namespace EndTime.Core;
+namespace EndTime.Core.Data;
 
 public class TileRegistry
 {

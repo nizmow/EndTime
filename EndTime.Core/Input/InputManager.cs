@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-using System.Reflection.Metadata.Ecma335;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -18,7 +16,7 @@ public class InputManager
         { Keys.K, new MoveDownAction() },
         { Keys.H, new MoveLeftAction() },
         { Keys.L, new MoveRightAction() },
-        { Keys.Escape, new QuitAction() }
+        { Keys.Escape, new QuitAction() },
     };
 
     public InputManager()
@@ -58,7 +56,6 @@ public class InputManager
                     }
                 }
             }
-
         }
 
         _oldState = newState;
@@ -71,7 +68,11 @@ public record Action();
 public record QuitAction() : Action();
 
 public record MoveAction(int DeltaX, int DeltaY) : Action();
+
 public record MoveUpAction() : MoveAction(0, 1);
+
 public record MoveDownAction() : MoveAction(0, -1);
+
 public record MoveLeftAction() : MoveAction(-1, 0);
+
 public record MoveRightAction() : MoveAction(1, 0);

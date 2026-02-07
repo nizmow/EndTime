@@ -1,8 +1,8 @@
-namespace EndTime.Core;
+namespace EndTime.Core.Utilities;
 
 /// <summary>
 /// A convenience enum for referencing CP437 characters with friendlyish names.
-/// 
+///
 /// This was AI generated -- turns out it is good for something?
 /// </summary>
 public enum CodePage437 : byte

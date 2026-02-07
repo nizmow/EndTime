@@ -1,5 +1,4 @@
-namespace EndTime.Core;
-
+namespace EndTime.Core.Data;
 
 public record TileDefinition(
     int Id,
