@@ -20,7 +20,7 @@ public class Engine(EntityRegistry _entityRegistry, TileRegistry _tileRegistry)
     public void Start()
     {
         var player = _entityRegistry.Spawn("player", 10, 10);
-        var map = new GameMap(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        var map = new GameMap(DEFAULT_WIDTH, DEFAULT_HEIGHT, _tileRegistry);
         map.SetTile(40, 25, 1);
         _world.SetPlayer(player);
         _world.Map = map;
@@ -36,8 +36,16 @@ public class Engine(EntityRegistry _entityRegistry, TileRegistry _tileRegistry)
         var player = _world.GetPlayer();
         if (playerAction is MoveAction moveAction)
         {
-            player.X += moveAction.DeltaX;
-            player.Y += moveAction.DeltaY;
+            var targetX = player.X + moveAction.DeltaX;
+            var targetY = player.Y + moveAction.DeltaY;
+            if (targetX >= 0 && targetX < DEFAULT_WIDTH && targetY >= 0 && targetY < DEFAULT_HEIGHT)
+            {
+                if (_world.IsWalkable(targetX, targetY))
+                {
+                    player.X += moveAction.DeltaX;
+                    player.Y += moveAction.DeltaY;
+                }
+            }
         }
 
         return GameStatus.Continue;

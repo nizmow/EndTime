@@ -6,7 +6,7 @@ namespace EndTime.Core.World;
 
 public class GameWorld
 {
-    private GameMap _map;
+    private GameMap _map = null!;
     private readonly EntityManager _entityManager;
     private Entity? _player;
 
@@ -24,8 +24,12 @@ public class GameWorld
     public GameWorld(TileRegistry tileRegistry)
     {
         _entityManager = new();
-        // Useless default map just in case nobody else sets one.
-        _map = new(1, 1);
+    }
+
+    public bool IsWalkable(int x, int y)
+    {
+        return _map.IsWalkable(x, y);
+        // TODO: check bounds, entities, etc.
     }
 
     public void AddEntity(Entity entity)
