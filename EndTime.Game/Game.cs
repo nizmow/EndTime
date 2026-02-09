@@ -1,25 +1,23 @@
-﻿using Endtime.Core;
+namespace EndTime.Game;
+
 using EndTime.Core.Data;
 using EndTime.Core.Engine;
 using EndTime.Core.Input;
 using EndTime.Core.Utilities;
+using Endtime.Game;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace EndTime.Core;
-
 public class EndTimeGame : Game
 {
-    private GraphicsDeviceManager _graphics;
-
-    // We have lazy initialisation of all these things, but we promise we will init
+    private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch = null!;
-    private Texture2D _tileAtlas = null!;
-    private Engine.Engine _engine = null!;
-    private Renderer _renderer = null!;
 
-    private readonly EntityRegistry _entityRegistry = new();
+    private Renderer _renderer = null!;
+    private Texture2D _tileAtlas = null!;
     private readonly TileRegistry _tileRegistry = new();
+    private readonly EntityRegistry _entityRegistry = new();
+    private readonly GameEngine _engine;
     private readonly InputManager _inputManager = new();
 
     private const int WIDTH = 80;
@@ -27,6 +25,8 @@ public class EndTimeGame : Game
 
     public EndTimeGame()
     {
+        _engine = new(_entityRegistry, _tileRegistry);
+
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = WIDTH * SpriteMath.Width,
@@ -79,8 +79,6 @@ public class EndTimeGame : Game
             )
         );
 
-        _engine = new Engine.Engine(_entityRegistry, _tileRegistry);
-
         base.Initialize();
     }
 
@@ -90,15 +88,16 @@ public class EndTimeGame : Game
         _tileAtlas = Content.Load<Texture2D>("cp437_font");
         _renderer = new Renderer(_tileRegistry, _tileAtlas);
 
+        base.LoadContent();
         // Start your engines here
         _engine.Start();
     }
 
     protected override void Update(GameTime gameTime)
     {
-        // input manager handles debounce/delay/repeat etc.
         var playerAction = _inputManager.GetInputAction(gameTime);
 
+        // Do not tick until we get an action
         if (playerAction != null)
         {
             var result = _engine.Update(playerAction);

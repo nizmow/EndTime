@@ -2,7 +2,7 @@ using EndTime.Core.Data;
 using EndTime.Core.World;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Endtime.Core;
+namespace Endtime.Game;
 
 public class Renderer
 {

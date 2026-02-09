@@ -5,7 +5,7 @@ using EndTime.Core.Input;
 using EndTime.Core.World;
 using EndTime.Core.World.Map;
 
-public class Engine(EntityRegistry _entityRegistry, TileRegistry _tileRegistry)
+public class GameEngine(EntityRegistry _entityRegistry, TileRegistry _tileRegistry)
 {
     private const int DEFAULT_WIDTH = 80;
     private const int DEFAULT_HEIGHT = 50;
